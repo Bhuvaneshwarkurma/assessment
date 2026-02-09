@@ -1,4 +1,3 @@
-Here’s a **clean, professional README.md** you can directly paste into your project (GitHub-ready and suitable for evaluation submission).
 
 ---
 
