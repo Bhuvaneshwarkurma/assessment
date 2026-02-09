@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FNOL Claims Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ⭐⭐⭐ YOUR ENTIRE ORIGINAL CSS IS UNCHANGED ⭐⭐⭐ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+--primary:#2563eb;
+--primary-dark:#1d4ed8;
+--primary-light:#dbeafe;
+--success:#22c55e;
+--success-light:#dcfce7;
+--error:#ef4444;
+--error-light:#fee2e2;
+--slate-50:#f8fafc;
+--slate-100:#f1f5f9;
+--slate-200:#e2e8f0;
+--slate-300:#cbd5e1;
+--slate-400:#94a3b8;
+--slate-500:#64748b;
+--slate-600:#475569;
+--slate-700:#334155;
+--slate-800:#1e293b;
+--slate-900:#0f172a;
+}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#f8fafc 0%,#eff6ff 50%,#eef2ff 100%);min-height:100vh;color:var(--slate-800);}
+.header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 50%,#7c3aed 100%);}
+.header-content{max-width:1200px;margin:0 auto;padding:3rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+.logo{width:48px;height:48px;background:rgba(255,255,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.logo svg{width:24px;height:24px;color:white;}
+.header-text h1{color:white;font-size:1.5rem;font-weight:700;}
+.header-text p{color:rgba(255,255,255,0.7);font-size:0.875rem;}
+.container{max-width:640px;margin:0 auto;padding:3rem 1.5rem;}
+.card{background:white;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.05);}
+.card-header{padding:1.75rem 1.75rem 0;}
+.card-title{font-size:1.25rem;font-weight:600;}
+.card-description{font-size:0.875rem;color:var(--slate-500);}
+.card-content{padding:1.75rem;}
+.upload-area{border:2px dashed var(--slate-200);border-radius:16px;background:var(--slate-50);padding:2.5rem 2rem;text-align:center;cursor:pointer;}
+.upload-area.has-file{border-color:var(--success);background:var(--success-light);}
+.hidden-input{display:none;}
+.btn{width:100%;padding:0.875rem 1.5rem;border:none;border-radius:12px;font-size:1rem;font-weight:500;cursor:pointer;margin-top:1.5rem;}
+.btn-primary{background:linear-gradient(135deg,var(--primary) 0%,#4f46e5 100%);color:white;}
+.output-section{display:none;margin-top:1.5rem;}
+.output-section.show{display:block;}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;}
+.output-title{font-size:0.875rem;font-weight:600;display:flex;gap:0.5rem;}
+.status-dot{width:8px;height:8px;background:var(--success);border-radius:50%;}
+.btn-copy{padding:0.375rem 0.75rem;border:none;background:transparent;border-radius:6px;font-size:0.75rem;cursor:pointer;color:var(--slate-500);}
+.btn-copy:hover{background:var(--slate-100);}
+.code-block{background:var(--slate-900);border-radius:12px;padding:1.25rem;}
+.code-block pre{color:#4ade80;font-size:0.8125rem;}
+.footer{text-align:center;margin-top:2rem;}
+.footer p{font-size:0.75rem;color:var(--slate-400);}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+<div class="header-content">
+<div class="logo"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75"/></svg></div>
+<div class="header-text"><h1>FNOL Claims Agent</h1><p>Autonomous Insurance Claims Processing</p></div>
+</div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+<h2 class="card-title">Submit Your Claim</h2>
+<p class="card-description">Upload your claim documentation for automated processing</p>
+</div>
+
+<div class="card-content">
+
+<div class="upload-area" id="uploadArea">
+<input type="file" id="fileInput" class="hidden-input">
+<p id="fileName">Drop your file here, or browse</p>
+</div>
+
+<button class="btn btn-primary" id="processBtn">Process Claim</button>
+
+<div class="output-section" id="outputSection">
+<div class="output-header">
+<h3 class="output-title"><span class="status-dot"></span>Output JSON</h3>
+
+<div style="display:flex;gap:6px;">
+<button class="btn-copy" id="copyBtn">Copy</button>
+
+<!-- ✅ ONLY ADDITION -->
+<button class="btn-copy" id="downloadBtn">Download</button>
+
+</div>
+
+</div>
+<div class="code-block"><pre id="outputContent"></pre></div>
+</div>
+
+</div>
+</div>
+
+<footer class="footer"><p>Secure, automated claims processing powered by AI</p></footer>
+</main>
+
+<script>
+
+const uploadArea=document.getElementById('uploadArea');
+const fileInput=document.getElementById('fileInput');
+const processBtn=document.getElementById('processBtn');
+const outputSection=document.getElementById('outputSection');
+const outputContent=document.getElementById('outputContent');
+const copyBtn=document.getElementById('copyBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const fileName=document.getElementById('fileName');
+
+let currentFile=null;
+
+uploadArea.addEventListener('click',()=>fileInput.click());
+
+fileInput.addEventListener('change',(e)=>{
+const file=e.target.files[0];
+if(file){
+currentFile=file;
+fileName.textContent=file.name;
+}
+});
+
+async function uploadFile(){
+
+const formData=new FormData();
+formData.append("file",currentFile);
+
+const res=await fetch("/process",{method:"POST",body:formData});
+const text=await res.text();
+const data=JSON.parse(text);
+
+outputContent.textContent=JSON.stringify(data,null,2);
+outputSection.classList.add('show');
+}
+
+processBtn.addEventListener('click',uploadFile);
+
+copyBtn.addEventListener('click',async()=>{
+await navigator.clipboard.writeText(outputContent.textContent);
+});
+
+
+// ⭐⭐⭐ ONLY NEW FEATURE ⭐⭐⭐
+downloadBtn.addEventListener('click',()=>{
+
+if(!outputContent.textContent)return;
+
+const blob=new Blob([outputContent.textContent],{type:"application/json"});
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+a.href=url;
+
+let name=currentFile?currentFile.name.split(".")[0]:"fnol_output";
+a.download=name+"_result.json";
+
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+URL.revokeObjectURL(url);
+
+});
+
+</script>
+</body>
+</html>
