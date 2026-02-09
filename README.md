@@ -95,7 +95,12 @@ http://127.0.0.1:5000
 
 ---
 
+
+
+
 ## 🧠 Processing Logic
+## DEMO VIDEO 
+https://github.com/user-attachments/assets/c640f41c-88de-471a-bdbf-9f71b239e4da
 
 After upload, the system:
 
